@@ -26,9 +26,16 @@ npm ci
 npm run build:user-service
 npm run build:sync-service
 npm run build:api-gateway
+npm run build:web-dashboard
 ```
 
-## Run services (3 terminals)
+## 🚀 Quick Start (Recommended)
+Chạy tất cả services với 1 lệnh:
+```powershell
+.\scripts\run-dashboard.ps1
+```
+
+## Run services (4 terminals)
 - user-service (port 3001)
 ```powershell
 $env:port = 3001
@@ -44,6 +51,11 @@ node dist/apps/sync-service/main.js
 $env:port = 3000
 node dist/apps/api-gateway/main.js
 ```
+- web-dashboard (port 3003)
+```powershell
+$env:port = 3003
+node dist/apps/web-dashboard/main.js
+```
 
 ## Health checks
 ```powershell
@@ -51,6 +63,15 @@ Invoke-RestMethod -Method Get -Uri http://localhost:3000/health
 Invoke-RestMethod -Method Get -Uri http://localhost:3001/users/health
 Invoke-RestMethod -Method Get -Uri http://localhost:3002/health
 ```
+
+## 🎨 Web Dashboard
+Mở trình duyệt và truy cập: **http://localhost:3003**
+
+Dashboard cung cấp:
+- 📊 Xem users từ MongoDB và Redis real-time
+- 🚀 Tạo user mới (Mongo-first hoặc Redis-first)
+- 📈 Metrics sync (processed, conflicts, retries)
+- 🔄 Auto-refresh mỗi 30 giây
 
 ## Mongo-first flow (API → Mongo → Redis)
 ```powershell

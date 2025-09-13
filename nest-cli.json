@@ -1,14 +1,13 @@
 {
   "$schema": "https://json.schemastore.org/nest-cli",
   "collection": "@nestjs/schematics",
-  "sourceRoot": "apps/redis-mongo-sync-ms/src",
-  "compilerOptions": {
-    "deleteOutDir": true,
-    "webpack": true,
-    "tsConfigPath": "apps/redis-mongo-sync-ms/tsconfig.app.json"
-  },
   "monorepo": true,
-  "root": "apps/redis-mongo-sync-ms",
+  "root": "apps",
+  "sourceRoot": "apps",
+  "compilerOptions": { 
+    "deleteOutDir": true,
+    "webpack": false
+  },
   "projects": {
     "api-gateway": {
       "type": "application",
@@ -19,22 +18,13 @@
         "tsConfigPath": "apps/api-gateway/tsconfig.app.json"
       }
     },
-    "redis-mongo-sync-ms": {
+    "user-service": {
       "type": "application",
-      "root": "apps/redis-mongo-sync-ms",
+      "root": "apps/user-service",
       "entryFile": "main",
-      "sourceRoot": "apps/redis-mongo-sync-ms/src",
+      "sourceRoot": "apps/user-service/src",
       "compilerOptions": {
-        "tsConfigPath": "apps/redis-mongo-sync-ms/tsconfig.app.json"
-      }
-    },
-    "shared": {
-      "type": "library",
-      "root": "libs/shared",
-      "entryFile": "index",
-      "sourceRoot": "libs/shared/src",
-      "compilerOptions": {
-        "tsConfigPath": "libs/shared/tsconfig.lib.json"
+        "tsConfigPath": "apps/user-service/tsconfig.app.json"
       }
     },
     "sync-service": {
@@ -46,13 +36,13 @@
         "tsConfigPath": "apps/sync-service/tsconfig.app.json"
       }
     },
-    "user-service": {
+    "web-dashboard": {
       "type": "application",
-      "root": "apps/user-service",
+      "root": "apps/web-dashboard",
       "entryFile": "main",
-      "sourceRoot": "apps/user-service/src",
+      "sourceRoot": "apps/web-dashboard/src",
       "compilerOptions": {
-        "tsConfigPath": "apps/user-service/tsconfig.app.json"
+        "tsConfigPath": "apps/web-dashboard/tsconfig.app.json"
       }
     }
   }

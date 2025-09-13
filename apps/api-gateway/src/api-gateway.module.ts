@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ApiGatewayController } from './api-gateway.controller';
 import { ApiGatewayService } from './api-gateway.service';
-import { RedisModule } from 'rms/shared/redis.module';
+import { RedisModule, MongoDbModule } from '../../../libs/shared/src';
 
 @Module({
   imports: [RedisModule],

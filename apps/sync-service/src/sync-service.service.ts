@@ -1,5 +1,5 @@
 import { Inject, Injectable, Logger, OnModuleInit } from '@nestjs/common';
-import { REDIS_CLIENT } from 'rms/shared';
+import { REDIS_CLIENT } from '../../../libs/shared/src';
 import Redis from 'ioredis';
 import { RedisToMongoConsumer } from './redis-to-mongo.consumer';
 import { InjectModel } from '@nestjs/mongoose';

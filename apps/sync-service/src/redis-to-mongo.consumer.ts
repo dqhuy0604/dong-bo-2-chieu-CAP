@@ -1,7 +1,7 @@
 import { Inject, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { REDIS_CLIENT } from 'rms/shared';
+import { REDIS_CLIENT } from '../../../libs/shared/src';
 import Redis from 'ioredis';
 import { User, UserDocument } from '../../user-service/src/user.schema';
 

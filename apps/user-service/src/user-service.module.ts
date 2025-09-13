@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { UserServiceController } from './user-service.controller';
 import { UserServiceService } from './user-service.service';
-import { MongoDbModule, RedisModule } from 'rms/shared';
+import { MongoDbModule, RedisModule } from '../../../libs/shared/src';
 import { MongooseModule } from '@nestjs/mongoose';
 import { User, UserSchema } from './user.schema';
 

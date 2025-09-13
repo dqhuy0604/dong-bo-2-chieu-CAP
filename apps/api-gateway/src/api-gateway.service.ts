@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { REDIS_CLIENT } from 'rms/shared/redis.module';
+import { REDIS_CLIENT } from '../../../libs/shared/src';
 import Redis from 'ioredis';
 
 @Injectable()

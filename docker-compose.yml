@@ -30,6 +30,22 @@ services:
       timeout: 3s
       retries: 20
 
+  web-dashboard:
+    build:
+      context: .
+      dockerfile: Dockerfile.web-dashboard
+    container_name: rms_web_dashboard
+    ports:
+      - "3003:3003"
+    depends_on:
+      - mongo
+      - redis
+    environment:
+      - NODE_ENV=production
+      - port=3003
+    networks:
+      - default
+
 networks:
   default:
     name: rms_network

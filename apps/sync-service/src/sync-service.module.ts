@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { SyncServiceController } from './sync-service.controller';
 import { SyncServiceService } from './sync-service.service';
-import { RedisModule, MongoDbModule } from 'rms/shared';
+import { RedisModule, MongoDbModule } from '../../../libs/shared/src';
 import { MongooseModule } from '@nestjs/mongoose';
 import { User, UserSchema } from '../../user-service/src/user.schema';
 
