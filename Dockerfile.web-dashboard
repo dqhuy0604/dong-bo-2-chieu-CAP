@@ -23,3 +23,5 @@ EXPOSE 3003
 # Start the application
 CMD ["node", "dist/apps/web-dashboard/main.js"]
 
+
+

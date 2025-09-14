@@ -9,7 +9,7 @@ interface ChangeEvent {
     eventId: string;
     entity: 'user';
     op: 'create' | 'update' | 'delete';
-    id: string; // email
+    id: string;
     data: any | null;
     updatedAt: number;
     version: number;
@@ -20,7 +20,7 @@ export class RedisToMongoConsumer {
     private readonly logger = new Logger(RedisToMongoConsumer.name);
     private readonly streamKey = 'redis_changes';
     private readonly consumerGroup = 'sync_service_group_r2m';
-    private readonly consumerName = `consumer_${Math.random().toString(36).slice(2, 8)}`;
+    private readonly consumerName = 'redis-to-mongo-worker-1';
     private readonly processedSet = 'processed_events';
 
     private processedCount = 0;
@@ -51,9 +51,41 @@ export class RedisToMongoConsumer {
         }
     }
 
+    async claimPendingMessages() {
+        try {
+            const result = await this.redis.xautoclaim(
+                this.streamKey,
+                this.consumerGroup,
+                this.consumerName,
+                '30000',
+                '0-0'
+            ) as any[];
+
+            if (result && result.length >= 2) {
+                const claimedMessages = result[1] as any[];
+                if (claimedMessages && claimedMessages.length > 0) {
+                    this.logger.log(`Auto-claimed ${claimedMessages.length} pending messages`);
+
+                    for (const [messageId, fields] of claimedMessages) {
+                        await this.handleEntry(messageId, fields);
+                    }
+                }
+            }
+        } catch (error) {
+            this.logger.error('Failed to auto-claim pending messages', error);
+        }
+    }
+
     async poll() {
+        let lastAutoClaim = Date.now();
+
         for (; ;) {
             try {
+                if (Date.now() - lastAutoClaim > 30000) {
+                    await this.claimPendingMessages();
+                    lastAutoClaim = Date.now();
+                }
+
                 const res = await this.redis.xreadgroup(
                     'GROUP',
                     this.consumerGroup,
@@ -74,8 +106,36 @@ export class RedisToMongoConsumer {
                 }
             } catch (err) {
                 this.logger.error('xreadgroup error', err as Error);
+                await this.sleep(1000);
             }
         }
+    }
+
+    private sleep(ms: number): Promise<void> {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    private async retryMongoOperation<T>(operation: () => Promise<T>, maxRetries: number = 3): Promise<T> {
+        let lastError: Error;
+
+        for (let attempt = 0; attempt <= maxRetries; attempt++) {
+            try {
+                return await operation();
+            } catch (error) {
+                lastError = error as Error;
+
+                if (attempt === maxRetries) {
+                    this.logger.error(`MongoDB operation failed after ${maxRetries} retries`, lastError);
+                    throw lastError;
+                }
+
+                const delay = Math.pow(2, attempt) * 1000;
+                this.logger.warn(`MongoDB operation failed, retrying in ${delay}ms (attempt ${attempt + 1}/${maxRetries + 1})`, error);
+                await this.sleep(delay);
+            }
+        }
+
+        throw lastError!;
     }
 
     private async handleEntry(entryId: string, fields: any[]) {
@@ -93,30 +153,35 @@ export class RedisToMongoConsumer {
             }
 
             if (event.op === 'delete') {
-                await this.userModel.deleteOne({ email: event.id });
+                await this.retryMongoOperation(() =>
+                    this.userModel.deleteOne({ email: event.id })
+                );
             } else if (event.data) {
-                const current = await this.userModel.findOne({ email: event.id }).lean();
+                const current = await this.retryMongoOperation(() =>
+                    this.userModel.findOne({ email: event.id }).lean()
+                );
                 let shouldApply = true;
                 if (current) {
                     if (current.updatedAt > event.updatedAt) shouldApply = false;
                     else if (current.updatedAt === event.updatedAt) {
-                        // tiebreaker: prefer mongo → reject equal
                         shouldApply = false;
                         this.conflictCount++;
                     }
                 }
                 if (shouldApply) {
-                    await this.userModel.updateOne(
-                        { email: event.id },
-                        {
-                            $set: {
-                                name: event.data.name,
-                                updatedAt: event.updatedAt,
-                                source: 'redis',
+                    await this.retryMongoOperation(() =>
+                        this.userModel.updateOne(
+                            { email: event.id },
+                            {
+                                $set: {
+                                    name: event.data.name,
+                                    updatedAt: event.updatedAt,
+                                    source: 'redis',
+                                },
+                                $inc: { version: 1 },
                             },
-                            $inc: { version: 1 },
-                        },
-                        { upsert: true },
+                            { upsert: true },
+                        )
                     );
                 }
             }
@@ -128,7 +193,6 @@ export class RedisToMongoConsumer {
         } catch (err) {
             this.logger.error(`Failed to handle entry ${entryId}`, err as Error);
             this.retryCount++;
-            // Do not ack on failure; it will remain pending for retry
         }
     }
 

@@ -229,7 +229,7 @@ export class WebDashboardController {
 <body>
     <div class="container">
         <div class="header">
-            <h1>🔄 Redis-MongoDB Sync Dashboard</h1>
+            <h1>Redis-MongoDB Sync Dashboard</h1>
             <p>Đồng bộ dữ liệu hai chiều với NestJS Microservices</p>
         </div>
         
@@ -257,7 +257,7 @@ export class WebDashboardController {
         </div>
         
         <div class="form-section">
-            <h2>🚀 Tạo User Mới</h2>
+            <h2>Tạo User Mới</h2>
             <form id="userForm">
                 <div class="form-group">
                     <label for="email">Email:</label>
@@ -269,10 +269,10 @@ export class WebDashboardController {
                 </div>
                 <div class="button-group">
                     <button type="button" class="btn btn-mongo" onclick="createUser('mongo')">
-                        📊 Mongo-First
+                        Mongo-First
                     </button>
                     <button type="button" class="btn btn-redis" onclick="createUser('redis')">
-                        ⚡ Redis-First
+                        Redis-First
                     </button>
                 </div>
             </form>
@@ -281,7 +281,7 @@ export class WebDashboardController {
         
         <div class="content">
             <div class="section">
-                <h2>📊 MongoDB Users</h2>
+                <h2>MongoDB Users</h2>
                 <div class="user-list">
                     ${mongoUsers.map(user => `
                         <div class="user-item mongo">
@@ -298,7 +298,7 @@ export class WebDashboardController {
             </div>
             
             <div class="section">
-                <h2>⚡ Redis Users</h2>
+                <h2>Redis Users</h2>
                 <div class="user-list">
                     ${redisUsers.map(user => `
                         <div class="user-item redis">
@@ -317,7 +317,7 @@ export class WebDashboardController {
         
         <div style="text-align: center; padding: 20px;">
             <button class="btn btn-refresh" onclick="location.reload()">
-                🔄 Làm mới dữ liệu
+                Làm mới dữ liệu
             </button>
         </div>
     </div>
@@ -346,13 +346,13 @@ export class WebDashboardController {
                 const result = await response.json();
                 
                 if (response.ok) {
-                    showStatus(\`✅ Tạo user thành công! (\${type === 'mongo' ? 'Mongo-First' : 'Redis-First'})\`, 'success');
+                    showStatus(\`Tạo user thành công! (\${type === 'mongo' ? 'Mongo-First' : 'Redis-First'})\`, 'success');
                     setTimeout(() => location.reload(), 2000);
                 } else {
-                    showStatus(\`❌ Lỗi: \${result.message || 'Không thể tạo user'}\`, 'error');
+                    showStatus(\`Lỗi: \${result.message || 'Không thể tạo user'}\`, 'error');
                 }
             } catch (error) {
-                showStatus(\`❌ Lỗi kết nối: \${error.message}\`, 'error');
+                showStatus(\`Lỗi kết nối: \${error.message}\`, 'error');
             }
         }
         
@@ -361,7 +361,6 @@ export class WebDashboardController {
             statusDiv.innerHTML = \`<div class="status \${type}">\${message}</div>\`;
         }
         
-        // Auto refresh every 30 seconds
         setTimeout(() => location.reload(), 30000);
     </script>
 </body>

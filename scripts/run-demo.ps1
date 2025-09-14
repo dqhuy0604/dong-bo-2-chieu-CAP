@@ -59,3 +59,5 @@ docker stop rms_mongo rms_redis
 docker rm rms_mongo rms_redis
 Write-Host "All services stopped!" -ForegroundColor Green
 
+
+
